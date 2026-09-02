@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "package": "org.lightovich.twm.mixin.client",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "BackgroundRendererMixin",
+    "ClientPlayNetworkHandlerMixin",
+    "ClientPlayerEntityMixin",
+    "ClientWorldMixin",
+    "EntityClientMixin",
+    "EntityLookMixin",
+    "InGameHudMixin",
+    "KeyboardInputMixin",
+    "LivingEntityClientMixin",
+    "PlayerEntityRendererMixin",
+    "SoundSystemMixin",
+    "WorldRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

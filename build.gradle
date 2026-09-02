@@ -1,0 +1,110 @@
+plugins {
+    id 'fabric-loom' version '1.9-SNAPSHOT'
+    id 'java'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://maven.fabricmc.net/" }
+    maven { url "https://api.modrinth.com/maven" }
+    maven { url "https://mcef-download.cinemamod.com/repositories/releases" }
+    maven { url "https://maven.maxhenkel.de/repository/public" }
+    maven { url "https://maven.nucleoid.xyz/" }
+}
+
+loom {
+    runs {
+        client {
+            client()
+            setConfigName("Client")
+            runDir("run")
+        }
+        server {
+            server()
+            setConfigName("Server")
+            runDir("run-server")
+            programArg "--nogui"
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+    // Веб-движок интерфейса. compileOnly: собираемся против api, а в готовый jar MCEF
+    // приезжает вложенным (jar-in-jar) — игроку не надо ставить его отдельным модом.
+    //
+    // MCEF под LGPL 2.1: вкладывать разрешено, пока мы его не правим. Он лежит внутри
+    // отдельным нетронутым jar, заменяемым — положенный в mods/ свежий mcef перекрывает
+    // вложенный. Условия и ссылка на исходники — в THIRD-PARTY.md, он же попадает в jar.
+    // Серверу MCEF безвреден: его точка входа server-side пустая, миксины все client.
+    modCompileOnly "com.cinemamod:mcef:${project.mcef_version}"
+    modLocalRuntime "com.cinemamod:mcef-fabric:${project.mcef_version}"
+    include "com.cinemamod:mcef-fabric:${project.mcef_version}"
+
+    // Simple Voice Chat. API — обычный jar без ссылок на Minecraft, поэтому compileOnly, а не
+    // modCompileOnly: ремапить в нём нечего. В рантайме классы api приезжают внутри самого мода.
+    //
+    // Сам мод в сборку не вкладывается (jar-in-jar) и в dev-запуски не подтягивается:
+    // он под «all rights reserved», а его свежие сборки собраны Loom 1.17 — наш Loom 1.9
+    // отказывается их ремапить. Ставится он обычным способом, готовым jar в mods/ —
+    // и на сервере, и на клиентах.
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:${project.voicechat_api_version}"
+
+    testImplementation platform("org.junit:junit-bom:5.11.3")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+
+    // Fantasy: миры, создаваемые и удаляемые на ходу. На нём стоят арены — каждой команде
+    // свои оверворлд, незер и энд, чтобы забеги не пересекались.
+    //
+    // LGPL 3.0, как и сам мод: вкладывать неизменённым можно, форк не заводился. Вложен
+    // (jar-in-jar) по той же причине, что и MCEF, — игрок кладёт в mods/ один файл.
+    modImplementation "xyz.nucleoid:fantasy:${project.fantasy_version}"
+    include "xyz.nucleoid:fantasy:${project.fantasy_version}"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+
+processResources {
+    inputs.property "version", project.version
+    filteringCharset "UTF-8"
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+// Лицензии обязаны ехать вместе со сборкой, а не лежать только в репозитории: и своя
+// (LGPL 3.0 у мода), и чужая (LGPL 2.1 у вложенного MCEF). Разбор — в THIRD-PARTY.md.
+jar {
+    from(rootProject.file("LICENSE"))
+    from(rootProject.file("THIRD-PARTY.md"))
+    from(rootProject.file("licenses")) {
+        into "licenses"
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.release = 21
+}

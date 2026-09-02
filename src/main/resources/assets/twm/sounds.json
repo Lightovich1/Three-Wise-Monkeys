@@ -1,0 +1,59 @@
+{
+  "echo_ping": {
+    "subtitle": "subtitles.twm.echo_ping",
+    "sounds": [
+      {
+        "name": "twm:echo_ping",
+        "stream": false
+      }
+    ]
+  },
+  "ui_tap": {
+    "sounds": [
+      {
+        "name": "twm:ui_tap",
+        "stream": false
+      }
+    ]
+  },
+  "ui_click": {
+    "sounds": [
+      {
+        "name": "twm:ui_click",
+        "stream": false
+      }
+    ]
+  },
+  "ui_back": {
+    "sounds": [
+      {
+        "name": "twm:ui_back",
+        "stream": false
+      }
+    ]
+  },
+  "ui_tap_air": {
+    "sounds": [
+      {
+        "name": "twm:ui_tap_air",
+        "stream": false
+      }
+    ]
+  },
+  "ui_click_air": {
+    "sounds": [
+      {
+        "name": "twm:ui_click_air",
+        "stream": false
+      }
+    ]
+  },
+  "ui_back_air": {
+    "sounds": [
+      {
+        "name": "twm:ui_back_air",
+        "stream": false
+      }
+    ]
+  }
+}

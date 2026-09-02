@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "id": "twm",
+  "version": "${version}",
+  "name": "Three Wise Monkeys",
+  "description": "Hear no evil, see no evil, speak no evil.",
+  "authors": [
+    {
+      "name": "ArcanixRussia",
+      "contact": {
+        "homepage": "https://arcanix.ru"
+      }
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Lightovich",
+      "contact": {
+        "homepage": "https://www.youtube.com/@synapsewtf"
+      }
+    }
+  ],
+  "contact": {
+    "homepage": "https://arcanix.ru",
+    "discord": "https://discord.gg/arcanix",
+    "telegram": "https://t.me/arcanixru",
+    "instagram": "https://www.instagram.com/arcanixrussia/",
+    "youtube": "https://www.youtube.com/@synapsewtf"
+  },
+  "icon": "assets/twm/icon.png",
+  "license": "LGPL-3.0-or-later",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "org.lightovich.twm.Twm"
+    ],
+    "client": [
+      "org.lightovich.twm.client.TwmClient"
+    ],
+    "preLaunch": [
+      "org.lightovich.twm.voice.VoiceBootstrap",
+      "org.lightovich.twm.client.cef.install.CefInstallBootstrap"
+    ],
+    "voicechat": [
+      "org.lightovich.twm.voice.TwmVoicechatPlugin"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*",
+    "mcef": "*",
+    "fantasy": "*"
+  },
+  "suggests": {
+    "voicechat": ">=2.6.0"
+  },
+  "mixins": [
+    "twm.mixins.json",
+    {
+      "config": "twm.client.mixins.json",
+      "environment": "client"
+    },
+    {
+      "config": "twm.mcef.mixins.json",
+      "environment": "client"
+    }
+  ]
+}
