@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import org.lightovich.twm.Twm;
+import org.lightovich.twm.client.cef.install.CefConsent;
 import org.lightovich.twm.client.cef.install.CefFetcher;
 import org.lightovich.twm.client.cef.install.CefInstall;
 
@@ -49,14 +50,27 @@ public abstract class McefDownloaderMixin {
     public abstract String getHost();
 
     /**
-     * Проверенная установка снимает нужду в сети целиком.
+     * Первое обращение к сети: сюда же вынесены оба повода его не делать.
      *
-     * <p>В оригинале контрольная сумма качается на каждом запуске, и неудача помечает MCEF
-     * как {@code failed} — то есть отсутствие интернета отключает интерфейс мода при полностью
-     * установленных бинарях. Совпадение сборки проверяем по метке, а не на слово.
+     * <p><b>Согласие игрока.</b> Файл сумм — самый ранний сетевой запрос MCEF, поэтому
+     * спрашивать надо здесь: дальше уже качается архив. Поток загрузки ждёт ответа
+     * ({@link CefConsent}), кадры игры рисует не он, так что ожидание никому не мешает.
+     *
+     * <p><b>Проверенная установка снимает нужду в сети целиком.</b> В оригинале контрольная
+     * сумма качается на каждом запуске, и неудача помечает MCEF как {@code failed} — то есть
+     * отсутствие интернета отключает интерфейс мода при полностью установленных бинарях.
+     * Совпадение сборки проверяем по метке, а не на слово.
      */
     @Inject(method = "downloadJavaCefChecksum", at = @At("HEAD"), cancellable = true)
     private void twm$skipWhenVerified(CallbackInfoReturnable<Boolean> info) {
+        if (!CefConsent.awaitDecision()) {
+            // Отказ. Возвращаем «сумма совпала»: так MCEF не пойдёт ни за архивом, ни за
+            // распаковкой. Метка провала — чтобы он не попытался поднять Chromium из пустой
+            // папки; игра в этот момент уже закрывается по кнопке «Выйти».
+            MCEFDownloadListener.INSTANCE.setFailed(true);
+            info.setReturnValue(true);
+            return;
+        }
         if (CefInstall.isVerified(twm$commit())) {
             Twm.LOGGER.info("Установка Chromium проверена ранее — сеть не нужна");
             info.setReturnValue(true);

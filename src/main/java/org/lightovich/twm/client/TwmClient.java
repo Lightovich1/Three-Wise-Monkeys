@@ -10,6 +10,7 @@
 package org.lightovich.twm.client;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -30,6 +31,7 @@ import org.lightovich.twm.client.cef.CefManager;
 import org.lightovich.twm.client.cef.CefScreen;
 import org.lightovich.twm.client.cef.HudCefManager;
 import org.lightovich.twm.client.cef.HudCefRenderer;
+import org.lightovich.twm.client.cef.install.CefConsent;
 import org.lightovich.twm.client.perception.EchoRenderer;
 import org.lightovich.twm.client.perception.Echolocation;
 import org.lightovich.twm.client.perception.SoundRadar;
@@ -125,6 +127,13 @@ public final class TwmClient implements ClientModInitializer {
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(TwmClient::onClientTick);
+
+        // Соглашение на установку бинарей Chromium. Отдельный обработчик, а не строчка в
+        // onClientTick: тот выходит без игрока, а спрашивают на главном меню.
+        ClientTickEvents.END_CLIENT_TICK.register(CefConsent::showWhenPending);
+        // Игрок закрыл окно, не ответив: поток загрузки MCEF не демон и без этого удержал бы
+        // JVM живой уже без окна.
+        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> CefConsent.release());
     }
 
     /**

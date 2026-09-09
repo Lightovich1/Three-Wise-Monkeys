@@ -126,5 +126,12 @@
   "twm.chat.stopped_shutdown": "Server is shutting down — run interrupted",
   "twm.chat.stopped_admin": "Run stopped by an administrator",
   "twm.err.host_only_rotate": "Only the host controls role rotation",
-  "twm.chat.rotated": "Roles shifted: head took the hands, hands took the legs, legs took the head"
+  "twm.chat.rotated": "Roles shifted: head took the hands, hands took the legs, legs took the head",
+  "twm.consent.title": "Three Wise Monkeys — file installation",
+  "twm.consent.what": "The mode's interface runs on an embedded Chromium browser. On first launch the mod downloads it from the MCEF project servers and unpacks it into mods/mcef-libraries: about 130 MB to download and up to 350 MB on disk.",
+  "twm.consent.privacy": "The mod downloads nothing else and sends no data about you anywhere. The downloaded archive is checked against its checksum.",
+  "twm.consent.refuse": "Pressing “Agree” allows this download and installation. Without it the mode's interface does not work and the game has to be closed.",
+  "twm.consent.footer": "Asked once. To bring the question back, delete config/twm-cef-consent.txt",
+  "twm.consent.accept": "Agree",
+  "twm.consent.exit": "Quit"
 }
